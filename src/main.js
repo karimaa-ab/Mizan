@@ -1,4 +1,5 @@
 import { getCurrentPrices, getGoldHistory, getSilverHistory } from "./api.js";
+import { recupererDevise, sauvegarderDevise } from "./storage.js";
 import { afficherPrix,
         afficherChargement,
         masquerChargement,
@@ -6,11 +7,14 @@ import { afficherPrix,
         masquerErreur
     } from "./ui.js";
 
+const deviseSelect = document.getElementById("devise-select");
+deviseSelect.value = recupererDevise();
+
 async function init(){
     afficherChargement();
     masquerErreur();
     try{
-        const data= await getCurrentPrices("MAD");
+        const data= await getCurrentPrices(deviseSelect.value);
         let history = null;
         try{
             history = await getGoldHistory();
@@ -35,4 +39,9 @@ init();
 const retryBtn = document.getElementById("retry-btn");
 
 retryBtn.addEventListener("click", init);
+function changerDevise(){
+    sauvegarderDevise(deviseSelect.value);
+    init();
+}
+deviseSelect.addEventListener("change", changerDevise);
 
